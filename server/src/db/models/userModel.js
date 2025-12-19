@@ -58,6 +58,12 @@ module.exports = (sequelize, DataTypes) => {
     {
       tableName: "User",
       paranoid: true,
+      indexes: [
+        {
+          unique: true,
+          fields: ["email", "userType"],
+        },
+      ],
       timestamps: true,
     }
   );
