@@ -1,11 +1,17 @@
 const { body, validationResult } = require("express-validator");
 
 const validateSignup = [
-  body("name")
+  body("firstName")
     .trim()
     .notEmpty()
-    .withMessage("Name is required")
-    .withMessage("Name must be at least 2 characters"),
+    .withMessage("First Name is required")
+    .withMessage("First Name must be at least 1 characters"),
+
+  body("lastName")
+    .trim()
+    .notEmpty()
+    .withMessage("Last Name is required")
+    .withMessage("Last Name must be at least 1 characters"),
 
   body("email")
     .trim()
