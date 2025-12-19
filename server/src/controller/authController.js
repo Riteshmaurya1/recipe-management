@@ -214,8 +214,36 @@ const refreshAccessToken = async (req, res, next) => {
   }
 };
 
+const logout = async (req, res, next) => {
+  try {
+    // Step1: get user id from decoded access token
+    const userId = req.userPayload.id;
+
+    // Step2: find user
+    const user = await User.findByPk(userId);
+    if (!user) {
+      const error = new Error("user not found");
+      error.statusCode = 404;
+      next(error);
+    }
+
+    // Step3: invalidate refresh token
+    user.refreshToken = null;
+    await user.save();
+
+    // Step4: respond
+    return res.status(200).json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   signup,
   signin,
   refreshAccessToken,
+  logout,
 };

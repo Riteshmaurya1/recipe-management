@@ -14,5 +14,6 @@ const isAuth = require("../middleware/verifyJwt");
 authRouter.post("/signup", validateSignup, signup);
 authRouter.post("/signin", validateSignIn, signin);
 authRouter.post("/refresh", refreshAccessToken);
+authRouter.post("/logout", isAuth, logout);
 
 module.exports = authRouter;
