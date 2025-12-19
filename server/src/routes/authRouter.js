@@ -4,6 +4,7 @@ const {
   signup,
   signin,
   refreshAccessToken,
+  logout,
 } = require("../controller/authController");
 const {
   validateSignup,

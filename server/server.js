@@ -3,11 +3,13 @@ const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 4000;
 const db = require("./src/config/db-connection");
+const cookieParser = require("cookie-parser");
 const globalErrorHandler = require("./src/middleware/globalErrorHandler");
 const authRouter = require("./src/routes/authRouter");
 
 // Middleware
 app.use(express.json());
+app.use(cookieParser());
 
 // Server confirmation Route
 app.get("/", (req, res) => {

@@ -3,6 +3,12 @@ const { User } = require("../db/models");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
+const COOKIE_OPTIONS = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "strict",
+};
+
 const signup = async (req, res, next) => {
   try {
     // Step1: get data from body
@@ -73,13 +79,20 @@ const signup = async (req, res, next) => {
     user.refreshToken = refreshToken;
     await user.save();
 
-    // Step8: return response
-    return res.status(201).json({
-      success: true,
-      message: "User created successfully",
-      accessToken,
-      refreshToken,
-    });
+    res
+      .cookie("accessToken", accessToken, {
+        ...COOKIE_OPTIONS,
+        maxAge: 15 * 60 * 1000, // 15 min
+      })
+      .cookie("refreshToken", refreshToken, {
+        ...COOKIE_OPTIONS,
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      })
+      .status(201)
+      .json({
+        success: true,
+        message: "User created successfully",
+      });
   } catch (error) {
     next(error);
   }
@@ -149,13 +162,21 @@ const signin = async (req, res, next) => {
     userByEmail.refreshToken = refreshToken;
     await userByEmail.save();
 
-    // Step: return response
-    return res.status(201).json({
-      success: true,
-      message: "User logged successfully",
-      accessToken,
-      refreshToken,
-    });
+    // Step8: return response
+    res
+      .cookie("accessToken", accessToken, {
+        ...COOKIE_OPTIONS,
+        maxAge: 15 * 60 * 1000,
+      })
+      .cookie("refreshToken", refreshToken, {
+        ...COOKIE_OPTIONS,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      })
+      .status(200)
+      .json({
+        success: true,
+        message: "User logged successfully",
+      });
   } catch (error) {
     next(error);
   }
@@ -205,10 +226,20 @@ const refreshAccessToken = async (req, res, next) => {
     user.refreshToken = newRefreshToken;
     await user.save();
 
-    return res.status(200).json({
-      accessToken: newAccessToken,
-      refreshToken: newRefreshToken, // if rotating
-    });
+    // Step6: response
+    res
+      .cookie("accessToken", newAccessToken, {
+        ...COOKIE_OPTIONS,
+        maxAge: 15 * 60 * 1000,
+      })
+      .cookie("refreshToken", newRefreshToken, {
+        ...COOKIE_OPTIONS,
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      })
+      .status(200)
+      .json({
+        message: "Token refreshed",
+      });
   } catch (err) {
     next(err);
   }
@@ -217,25 +248,21 @@ const refreshAccessToken = async (req, res, next) => {
 const logout = async (req, res, next) => {
   try {
     // Step1: get user id from decoded access token
-    const userId = req.userPayload.id;
+    const userId = req.payload.id;
+    console.log(userId);
 
     // Step2: find user
-    const user = await User.findByPk(userId);
-    if (!user) {
-      const error = new Error("user not found");
-      error.statusCode = 404;
-      next(error);
-    }
+    await User.update({ refreshToken: null }, { where: { id: userId } });
 
-    // Step3: invalidate refresh token
-    user.refreshToken = null;
-    await user.save();
-
-    // Step4: respond
-    return res.status(200).json({
-      success: true,
-      message: "Logged out successfully",
-    });
+    // Step3: respond
+    res
+      .clearCookie("accessToken")
+      .clearCookie("refreshToken")
+      .status(200)
+      .json({
+        success: true,
+        message: "Logged out successfully",
+      });
   } catch (error) {
     next(error);
   }

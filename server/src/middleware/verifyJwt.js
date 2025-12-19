@@ -2,14 +2,8 @@ const jwt = require("jsonwebtoken");
 const { User } = require("../db/models");
 
 const isAuth = async (req, res, next) => {
-  const authorization = req.headers.authorization;
-  if (!authorization) {
-    const err = new Error("Invalid token");
-    err.statusCode = 401;
-    return next(err);
-  }
-
-  const token = authorization.split(" ")[1];
+  // Read token from HttpOnly cookie
+  const token = req.cookies.accessToken;
   if (!token) {
     const err = new Error("Unauthorized");
     err.statusCode = 401;
@@ -25,8 +19,8 @@ const isAuth = async (req, res, next) => {
       err.statusCode = 400;
       return next(err);
     }
-
-    req.payload = user;
+    req.payload = decoded;
+    req.user = user;
     next();
   } catch (error) {
     if (error.name === "TokenExpiredError") {
