@@ -19,12 +19,12 @@ module.exports = (sequelize, DataTypes) => {
         },
       },
 
-      firstName: {
+      username: {
         type: DataTypes.STRING,
         allowNull: false,
       },
 
-      lastName: {
+      name: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -36,6 +36,18 @@ module.exports = (sequelize, DataTypes) => {
         validate: {
           isEmail: true,
         },
+        set(value) {
+          this.setDataValue("email", value.toLowerCase().trim());
+        },
+      },
+
+      phoneNumber: {
+        type: DataTypes.STRING(10),
+        allowNull: false,
+        validate: {
+          isNumeric: true,
+          len: [10, 10],
+        },
       },
 
       password: {
@@ -44,7 +56,7 @@ module.exports = (sequelize, DataTypes) => {
       },
     },
     {
-      tableName: "user",
+      tableName: "User",
       paranoid: true,
       timestamps: true,
     }
