@@ -44,6 +44,11 @@ module.exports = {
         allowNull: false,
       },
 
+      refreshToken: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
+
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

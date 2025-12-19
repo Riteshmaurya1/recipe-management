@@ -1,6 +1,7 @@
-const { generateAccessToken } = require("../auth/jwt");
+const { generateAccessToken, generateRefreshToken } = require("../auth/jwt");
 const { User } = require("../db/models");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const signup = async (req, res, next) => {
   try {
@@ -66,12 +67,18 @@ const signup = async (req, res, next) => {
       userType: user.userType,
     };
     const accessToken = generateAccessToken(userPayload);
+    const refreshToken = generateRefreshToken(userPayload);
 
-    // Step: return response
+    // Step7: Save refreshToken to the DB
+    user.refreshToken = refreshToken;
+    await user.save();
+
+    // Step8: return response
     return res.status(201).json({
       success: true,
       message: "User created successfully",
       accessToken,
+      refreshToken,
     });
   } catch (error) {
     next(error);
@@ -136,19 +143,79 @@ const signin = async (req, res, next) => {
       userType: userByEmail.userType,
     };
     const accessToken = generateAccessToken(userPayload);
+    const refreshToken = generateRefreshToken(userPayload);
+
+    // Step7: Save refreshToken to the DB
+    userByEmail.refreshToken = refreshToken;
+    await userByEmail.save();
 
     // Step: return response
     return res.status(201).json({
       success: true,
       message: "User logged successfully",
       accessToken,
+      refreshToken,
     });
   } catch (error) {
     next(error);
   }
 };
 
+const refreshAccessToken = async (req, res, next) => {
+  try {
+    // Step1: Check the refresh token
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      const error = new Error("Refresh token required");
+      error.statusCode = 401;
+      throw error;
+    }
+
+    // Step2: Verify refresh token & it's expiry
+    let decoded;
+    try {
+      decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
+      console.log(decoded);
+    } catch (err) {
+      const error = new Error("Invalid or expired refresh token");
+      error.statusCode = 403;
+      return next(error);
+    }
+
+    //Step3: Check that this token matches DB Refresh token
+    const user = await User.findByPk(decoded.id);
+    if (!user || user.refreshToken !== refreshToken) {
+      const error = new Error("Refresh token not found");
+      error.statusCode = 403;
+      throw error;
+    }
+
+    // Step4: Generate new access token || rotate refresh token
+    const userPayload = {
+      id: user.id,
+      user: user.name,
+      username: user.username,
+      email: user.email,
+      userType: user.userType,
+    };
+    const newAccessToken = generateAccessToken(userPayload);
+
+    // Step5: make a new refresh token
+    const newRefreshToken = generateRefreshToken(userPayload);
+    user.refreshToken = newRefreshToken;
+    await user.save();
+
+    return res.status(200).json({
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken, // if rotating
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   signup,
   signin,
+  refreshAccessToken,
 };
