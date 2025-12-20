@@ -54,11 +54,6 @@ module.exports = {
         allowNull: true,
       },
 
-      isPublic: {
-        type: Sequelize.BOOLEAN,
-        defaultValue: true,
-      },
-
       userId: {
         type: Sequelize.UUID,
         allowNull: false,

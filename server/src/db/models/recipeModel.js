@@ -51,11 +51,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.TEXT,
       },
 
-      isPublic: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
-      },
-
       userId: {
         type: DataTypes.UUID,
         allowNull: false,
