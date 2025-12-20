@@ -5,8 +5,9 @@ const PORT = process.env.PORT || 4000;
 const db = require("./src/config/db-connection");
 const cookieParser = require("cookie-parser");
 const globalErrorHandler = require("./src/middleware/globalErrorHandler");
-const authRouter = require("./src/routes/authRouter");
-const profileRouter = require("./src/routes/profileRouter");
+const authRoutes = require("./src/routes/authRouter");
+const profileRoutes = require("./src/routes/profileRouter");
+const recipeRoutes = require("./src/routes/recipeRouter");
 
 // Middleware
 app.use(express.json());
@@ -18,8 +19,9 @@ app.get("/", (req, res) => {
 });
 
 // Custom Routes
-app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/user", profileRouter);
+app.use("/api/v1/auth", authRoutes); //Completed ✔
+app.use("/api/v1/user", profileRoutes); //Some parts remaining.
+app.use("/api/v1/recipes", recipeRoutes);
 
 // Invalid routes
 app.use(/(.*)/, (req, res, next) => {
