@@ -6,6 +6,7 @@ const db = require("./src/config/db-connection");
 const cookieParser = require("cookie-parser");
 const globalErrorHandler = require("./src/middleware/globalErrorHandler");
 const authRouter = require("./src/routes/authRouter");
+const profileRouter = require("./src/routes/profileRouter");
 
 // Middleware
 app.use(express.json());
@@ -18,6 +19,7 @@ app.get("/", (req, res) => {
 
 // Custom Routes
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/user", profileRouter);
 
 // Invalid routes
 app.use(/(.*)/, (req, res, next) => {

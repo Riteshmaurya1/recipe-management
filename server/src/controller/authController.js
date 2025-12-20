@@ -70,6 +70,7 @@ const signup = async (req, res, next) => {
       user: user.name,
       username: user.username,
       email: user.email,
+      phoneNumber: user.phoneNumber,
       userType: user.userType,
     };
     const accessToken = generateAccessToken(userPayload);
@@ -153,6 +154,7 @@ const signin = async (req, res, next) => {
       user: userByEmail.name,
       username: userByEmail.username,
       email: userByEmail.email,
+      phoneNumber: userByEmail.phoneNumber,
       userType: userByEmail.userType,
     };
     const accessToken = generateAccessToken(userPayload);
@@ -217,6 +219,7 @@ const refreshAccessToken = async (req, res, next) => {
       user: user.name,
       username: user.username,
       email: user.email,
+      phoneNumber: user.phoneNumber,
       userType: user.userType,
     };
     const newAccessToken = generateAccessToken(userPayload);
