@@ -24,8 +24,8 @@ app.get("/", (req, res) => {
 app.use("/api/v1/auth", authRoutes); //Completed ✔
 app.use("/api/v1/user", profileRoutes); //Completed ✔
 app.use("/api/v1/recipes", recipeRoutes); //Completed ✔
-app.use("/api/v1/favorites", favoriteRoutes); //Now Working ? Some parts remaining
-app.use("/api/v1/collections", collectionRoutes); //Now Working ? Some parts remaining
+app.use("/api/v1/favorites", favoriteRoutes); //Completed ✔
+app.use("/api/v1/collections", collectionRoutes); //Completed ✔
 
 // Invalid routes
 app.use(/(.*)/, (req, res, next) => {
