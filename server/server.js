@@ -8,6 +8,8 @@ const globalErrorHandler = require("./src/middleware/globalErrorHandler");
 const authRoutes = require("./src/routes/authRouter");
 const profileRoutes = require("./src/routes/profileRouter");
 const recipeRoutes = require("./src/routes/recipeRouter");
+const favoriteRoutes = require("./src/routes/favoriteRouter");
+const collectionRoutes = require("./src/routes/collectionRouter");
 
 // Middleware
 app.use(express.json());
@@ -20,8 +22,10 @@ app.get("/", (req, res) => {
 
 // Custom Routes
 app.use("/api/v1/auth", authRoutes); //Completed ✔
-app.use("/api/v1/user", profileRoutes); //Some parts remaining.
-app.use("/api/v1/recipes", recipeRoutes);
+app.use("/api/v1/user", profileRoutes); //Completed ✔
+app.use("/api/v1/recipes", recipeRoutes); //Completed ✔
+app.use("/api/v1/favorites", favoriteRoutes); //Now Working ? Some parts remaining
+app.use("/api/v1/collections", collectionRoutes); //Now Working ? Some parts remaining
 
 // Invalid routes
 app.use(/(.*)/, (req, res, next) => {
