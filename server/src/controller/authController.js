@@ -83,7 +83,7 @@ const signup = async (req, res, next) => {
     res
       .cookie("accessToken", accessToken, {
         ...COOKIE_OPTIONS,
-        maxAge: 15 * 60 * 1000, // 15 min
+        maxAge: 24 * 60 * 60 * 1000, // 24h
       })
       .cookie("refreshToken", refreshToken, {
         ...COOKIE_OPTIONS,
@@ -168,7 +168,7 @@ const signin = async (req, res, next) => {
     res
       .cookie("accessToken", accessToken, {
         ...COOKIE_OPTIONS,
-        maxAge: 15 * 60 * 1000,
+        maxAge: 24 * 60 * 60 * 1000,
       })
       .cookie("refreshToken", refreshToken, {
         ...COOKIE_OPTIONS,
@@ -233,7 +233,7 @@ const refreshAccessToken = async (req, res, next) => {
     res
       .cookie("accessToken", newAccessToken, {
         ...COOKIE_OPTIONS,
-        maxAge: 15 * 60 * 1000,
+        maxAge: 24 * 60  * 60 * 1000,
       })
       .cookie("refreshToken", newRefreshToken, {
         ...COOKIE_OPTIONS,
