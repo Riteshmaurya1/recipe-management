@@ -72,6 +72,13 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: true,
     }
   );
+  User.associate = (models) => {
+    User.hasMany(models.Favorite, { foreignKey: "userId", as: "favorites" });
+    User.hasMany(models.Collection, {
+      foreignKey: "userId",
+      as: "collections",
+    });
+  };
 
   return User;
 };

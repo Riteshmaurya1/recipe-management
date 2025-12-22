@@ -50,7 +50,7 @@ module.exports = (sequelize, DataTypes) => {
       imageUrl: {
         type: DataTypes.TEXT,
       },
-      
+
       category: {
         type: DataTypes.STRING,
       },
@@ -82,6 +82,17 @@ module.exports = (sequelize, DataTypes) => {
       as: "author",
       onDelete: "CASCADE",
       onUpdate: "CASCADE",
+    });
+    Recipe.hasMany(models.Favorite, {
+      foreignKey: "recipeId",
+      as: "favorites",
+    });
+
+    Recipe.belongsToMany(models.Collection, {
+      through: "CollectionRecipe",
+      foreignKey: "recipeId",
+      otherKey: "collectionId",
+      as: "collections",
     });
   };
 
