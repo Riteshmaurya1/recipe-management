@@ -54,6 +54,14 @@ module.exports = {
         allowNull: true,
       },
 
+      category: {
+        type: Sequelize.STRING,
+      },
+
+      dietaryTags: {
+        type: Sequelize.ARRAY(Sequelize.STRING), // ["vegetarian", "vegan"]
+      },
+
       isPublic: {
         type: Sequelize.BOOLEAN,
         defaultValue: true,

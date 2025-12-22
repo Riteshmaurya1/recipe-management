@@ -50,6 +50,14 @@ module.exports = (sequelize, DataTypes) => {
       imageUrl: {
         type: DataTypes.TEXT,
       },
+      
+      category: {
+        type: DataTypes.STRING,
+      },
+
+      dietaryTags: {
+        type: DataTypes.ARRAY(DataTypes.STRING), // ["vegetarian", "vegan"]
+      },
 
       isPublic: {
         type: DataTypes.BOOLEAN,
