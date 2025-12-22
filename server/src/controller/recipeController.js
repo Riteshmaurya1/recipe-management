@@ -1,10 +1,14 @@
-const { User, Recipe } = require("../db/models");
+const { User, Recipe,sequelize } = require("../db/models");
+const { Op } = require("sequelize");
 
 // GET /api/v1/recipes  (browse + basic filters)
 const getAllRecipes = async (req, res, next) => {
   try {
     const {
       search,
+      ingredient,
+      category,
+      diet,
       difficulty,
       timeMin,
       timeMax,
@@ -14,24 +18,67 @@ const getAllRecipes = async (req, res, next) => {
 
     const offset = (page - 1) * limit;
 
+    // Step1: Base conditions
     const where = { isPublic: true };
 
-    if (difficulty) where.difficulty = difficulty;
-    if (timeMin) where.cookingTime = { ...where.cookingTime, $gte: +timeMin };
-    if (timeMax) where.cookingTime = { ...where.cookingTime, $lte: +timeMax };
-
-    // simple search on title/description (adjust to Sequelize syntax)
-    if (search) {
-      where.title = { $iLike: `%${search}%` };
-      // or use Op.iLike from Sequelize
+    // Step2: filter by difficulty.
+    if (difficulty) {
+      where.difficulty = difficulty;
     }
+
+    // Step3: Filter by cooking time
+    if (timeMin || timeMax) {
+      where.cookingTime = {};
+      if (timeMin) where.cookingTime[Op.gte] = +timeMin;
+      if (timeMax) where.cookingTime[Op.lte] = +timeMax;
+    }
+
+    //Step4: Filter by dietary tag
+    if (diet) {
+      where.dietaryTags = { [Op.contains]: [diet] };
+    }
+
+    //Step5: Filter by category
+    if (category) {
+      where.category = category;
+    }
+
+    //Step6: Search in title and description
+    if (search) {
+      where[Op.or] = [
+        { title: { [Op.iLike]: `%${search}%` } },
+        { description: { [Op.iLike]: `%${search}%` } },
+      ];
+    }
+
+    // Step7: Search by ingredient (partial match in ingredients array)
+    // if (ingredient) {
+    //   where.ingredients = { [Op.contains]: [ingredient] };
+    // }
+     // ingredient substring search: Op.iLike '%paneer%'
+    const havingIngredient = ingredient
+      ? sequelize.where(
+          // cast jsonb array to text
+          sequelize.cast(sequelize.col("ingredients"), "text"),
+          {
+            [Op.iLike]: `%${ingredient}%`,
+          }
+        )
+      : null;
 
     const { rows, count } = await Recipe.findAndCountAll({
       where,
+      ...(havingIngredient && { where: { ...where, [Op.and]: [havingIngredient] } }),
       offset,
       limit: +limit,
       order: [["createdAt", "DESC"]],
-      include: [{ model: User, as: "author", attributes: ["id", "name"] }],
+      include: [
+        {
+          model: User,
+          as: "author",
+          attributes: ["id", "name"],
+        },
+      ],
     });
 
     res.status(200).json({
@@ -72,7 +119,8 @@ const getRecipeById = async (req, res, next) => {
 const createRecipe = async (req, res, next) => {
   try {
     const userId = req.user.id;
-    // Step1: get Data from the user.
+
+    // Step1: get Data from the user
     const {
       title,
       description,
@@ -82,9 +130,11 @@ const createRecipe = async (req, res, next) => {
       servings,
       difficulty,
       imageUrl,
+      category,
+      dietaryTags,
     } = req.body;
 
-    // Step2: Validate all fields.
+    // Step2: Validate all required fields
     if (
       !title ||
       !ingredients ||
@@ -98,17 +148,39 @@ const createRecipe = async (req, res, next) => {
       return next(error);
     }
 
-    // Ste3: create recipe
+    // Optional: validate cookingTime and servings are numbers
+    if (isNaN(cookingTime) || cookingTime <= 0) {
+      const error = new Error("Cooking time must be a positive number");
+      error.statusCode = 400;
+      return next(error);
+    }
+    if (isNaN(servings) || servings <= 0) {
+      const error = new Error("Servings must be a positive number");
+      error.statusCode = 400;
+      return next(error);
+    }
+
+    // Optional: validate difficulty
+    const validDifficulties = ["easy", "medium", "hard"];
+    if (!validDifficulties.includes(difficulty)) {
+      const error = new Error("Invalid difficulty level");
+      error.statusCode = 400;
+      return next(error);
+    }
+
+    // Step3: create recipe
     const recipe = await Recipe.create({
       title: title.trim(),
-      description,
-      ingredients, // expect array or JSON from frontend
-      instructions,
-      cookingTime,
-      servings,
-      difficulty: difficulty || "easy",
-      imageUrl,
-      userId: userId, // from auth middleware
+      description: description?.trim() || null,
+      ingredients, // array of strings
+      instructions: instructions.trim(),
+      cookingTime: +cookingTime,
+      servings: +servings,
+      difficulty: difficulty,
+      imageUrl: imageUrl?.trim() || null,
+      category: category?.trim() || null,
+      dietaryTags: Array.isArray(dietaryTags) ? dietaryTags : [],
+      userId: userId,
     });
 
     return res.status(201).json({
@@ -149,6 +221,8 @@ const updateRecipe = async (req, res, next) => {
       difficulty,
       imageUrl,
       isPublic,
+      category,
+      dietaryTags,
     } = req.body;
 
     recipe.title = title ?? recipe.title;
@@ -159,6 +233,8 @@ const updateRecipe = async (req, res, next) => {
     recipe.servings = servings ?? recipe.servings;
     recipe.difficulty = difficulty ?? recipe.difficulty;
     recipe.imageUrl = imageUrl ?? recipe.imageUrl;
+    recipe.category = category ?? recipe.category;
+    recipe.dietaryTags = dietaryTags ?? recipe.dietaryTags;
     if (typeof isPublic === "boolean") recipe.isPublic = isPublic;
 
     await recipe.save();
