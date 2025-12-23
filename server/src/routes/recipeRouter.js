@@ -1,5 +1,6 @@
 const express = require("express");
 const recipeRouter = express.Router();
+const reviewRoutes = require("./reviewRouter");
 const {
   getAllRecipes,
   getRecipeById,
@@ -17,5 +18,8 @@ recipeRouter.get("/:id", getRecipeById);
 recipeRouter.post("/create", isAuth, createRecipe);
 recipeRouter.put("/:id", isAuth, updateRecipe);
 recipeRouter.delete("/delete/:id", isAuth, deleteRecipe);
+
+// nested reviews inside the recipe
+recipeRouter.use("/:recipeId/reviews", reviewRoutes);
 
 module.exports = recipeRouter;
