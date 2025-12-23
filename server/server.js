@@ -10,8 +10,7 @@ const profileRoutes = require("./src/routes/profileRouter");
 const recipeRoutes = require("./src/routes/recipeRouter");
 const favoriteRoutes = require("./src/routes/favoriteRouter");
 const collectionRoutes = require("./src/routes/collectionRouter");
-const followRoutes = require("./src/routes/followRouter");
-const feedRoutes = require("./src/routes/feedRouter");
+const adminRoutes = require("./src/routes/adminRouter");
 
 // Middleware
 app.use(express.json());
@@ -30,7 +29,7 @@ app.use("/api/v1/favorites", favoriteRoutes); //Completed ✔
 app.use("/api/v1/collections", collectionRoutes); //Completed ✔
 // app.use("/api/v1/follow", followRoutes); //Completed ✔ inside the profile router.
 // app.use("/api/v1/feed", feedRoutes); //Completed ✔ inside the profile router.
-
+app.use("/api/v1/admin", adminRoutes); //Completed ✔
 
 // Invalid routes
 app.use(/(.*)/, (req, res, next) => {
