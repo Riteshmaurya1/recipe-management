@@ -1,300 +1,324 @@
-# Recipe Management System - API Routes Documentation
+# 🍳 RecipeHub - Frontend
 
-## Base URL
+A modern, feature-rich frontend for the Recipe Management System built with vanilla HTML, CSS, and JavaScript.
+
+## 📁 Project Structure
+
 ```
-http://localhost:3000/api/v1
-```
-
----
-
-## 1. Authentication Routes (`/auth`)
-
-### POST `/auth/signup`
-**Description:** Register a new user  
-**Auth Required:** No  
-**Body:**
-```json
-{
-  "userType": "user", // or "admin"
-  "username": "john_doe",
-  "name": "John Doe",
-  "email": "john@example.com",
-  "phoneNumber": "1234567890",
-  "password": "password123"
-}
-```
-**Response:** Sets `accessToken` and `refreshToken` cookies
-
-### POST `/auth/signin`
-**Description:** Login user  
-**Auth Required:** No  
-**Body:**
-```json
-{
-  "userType": "user",
-  "email": "john@example.com",
-  "password": "password123"
-}
-```
-**Response:** Sets `accessToken` and `refreshToken` cookies
-
-### POST `/auth/refresh`
-**Description:** Refresh access token  
-**Auth Required:** No  
-**Body:**
-```json
-{
-  "refreshToken": "your-refresh-token"
-}
-```
-**Response:** New `accessToken` and `refreshToken` cookies
-
-### POST `/auth/logout`
-**Description:** Logout user  
-**Auth Required:** Yes  
-**Response:** Clears cookies
-
----
-
-## 2. User Profile Routes (`/user`)
-
-### GET `/user/profile`
-**Description:** Get current user profile  
-**Auth Required:** Yes
-
-### PUT `/user/profile`
-**Description:** Update current user profile  
-**Auth Required:** Yes  
-**Body:**
-```json
-{
-  "name": "John Updated",
-  "username": "john_updated",
-  "phoneNumber": "9876543210",
-  "password": "newpassword123"
-}
+recipe-frontend/
+├── index.html
+├── css/
+│   └── styles.css
+└── js/
+    ├── config.js
+    ├── ui.js
+    ├── auth.js
+    ├── recipe.js
+    ├── favorites.js
+    ├── collections.js
+    ├── profile.js
+    ├── feed.js
+    ├── reviews.js
+    ├── admin.js
+    └── app.js
 ```
 
----
+## ✨ Features
 
-## 3. Follow Routes (`/user/profile/follow`)
+### User Features
+- ✅ User Authentication (Signup/Login with User/Admin roles)
+- 🍽️ Recipe Management (CRUD operations)
+- 🔍 Advanced Search & Filters (search, category, difficulty, ingredient)
+- ❤️ Favorites System
+- 📚 Collections Management
+- ⭐ Reviews & Ratings
+- 👥 Follow/Unfollow Users
+- 📰 Personalized Feed
+- 👤 User Profile Management
 
-### POST `/user/profile/follow/:userId`
-**Description:** Follow a user  
-**Auth Required:** Yes
+### Admin Features
+- 👥 User Management (ban/unban, change user type)
+- 🍽️ Recipe Management (view, delete all recipes)
+- 📊 Dashboard with statistics
 
-### DELETE `/user/profile/follow/:userId`
-**Description:** Unfollow a user  
-**Auth Required:** Yes
+### UI/UX Features
+- 🎨 Modern gradient design
+- 📱 Fully responsive (mobile, tablet, desktop)
+- ⚡ Smooth animations and transitions
+- 🌙 Clean, professional interface
+- 💳 Card-based layouts
+- 🔔 Toast notifications
+- 🎯 Modal dialogs
 
-### GET `/user/profile/follow/following/me`
-**Description:** Get list of users I follow  
-**Auth Required:** Yes
+## 🚀 Getting Started
 
-### GET `/user/profile/follow/followers/me`
-**Description:** Get my followers list  
-**Auth Required:** Yes
+### Prerequisites
+- Backend server running on `http://localhost:3000`
+- Modern web browser (Chrome, Firefox, Safari, Edge)
 
----
+### Installation
 
-## 4. Feed Routes (`/user/profile/feed`)
+1. **Download/Clone the files**
+   ```bash
+   git clone <your-repo-url>
+   cd recipe-frontend
+   ```
 
-### GET `/user/profile/feed?limit=20&offset=0`
-**Description:** Get personalized feed from followed users  
-**Auth Required:** Yes  
-**Query Params:**
-- `limit` (default: 20)
-- `offset` (default: 0)
+2. **Update API Configuration**
+   
+   Open `js/config.js` and update the API base URL:
+   ```javascript
+   const API_BASE_URL = 'http://localhost:3000/api/v1';
+   ```
 
----
+3. **Start a local server**
+   
+   You can use any static file server. Here are some options:
 
-## 5. Recipe Routes (`/recipes`)
+   **Using Python:**
+   ```bash
+   # Python 3
+   python -m http.server 8000
+   
+   # Python 2
+   python -m SimpleHTTPServer 8000
+   ```
 
-### GET `/recipes`
-**Description:** Browse all public recipes with filters  
-**Auth Required:** No  
-**Query Params:**
-```
-?search=pasta
-&ingredient=tomato
-&category=italian
-&diet=vegetarian
-&difficulty=easy
-&timeMin=10
-&timeMax=30
-&page=1
-&limit=10
-```
+   **Using Node.js (http-server):**
+   ```bash
+   npx http-server -p 8000
+   ```
 
-### GET `/recipes/:id`
-**Description:** Get single recipe by ID  
-**Auth Required:** No
+   **Using VS Code:**
+   - Install "Live Server" extension
+   - Right-click on `index.html`
+   - Select "Open with Live Server"
 
-### POST `/recipes/create`
-**Description:** Create new recipe  
-**Auth Required:** Yes  
-**Body:**
-```json
-{
-  "title": "Spaghetti Carbonara",
-  "description": "Classic Italian pasta dish",
-  "ingredients": ["spaghetti", "eggs", "bacon", "parmesan"],
-  "instructions": "Cook pasta. Mix eggs and cheese...",
-  "cookingTime": 30,
-  "servings": 4,
-  "difficulty": "easy",
-  "imageUrl": "https://example.com/image.jpg",
-  "category": "italian",
-  "dietaryTags": ["non-vegetarian"]
-}
-```
+4. **Open in browser**
+   ```
+   http://localhost:8000
+   ```
 
-### PUT `/recipes/:id`
-**Description:** Update own recipe  
-**Auth Required:** Yes  
-**Body:** Same as create (all fields optional)
+## ⚙️ Backend Configuration
 
-### DELETE `/recipes/delete/:id`
-**Description:** Delete own recipe  
-**Auth Required:** Yes
+Ensure your backend has CORS enabled with credentials:
 
----
-
-## 6. Review Routes (`/recipes/:recipeId/reviews`)
-
-### POST `/recipes/:recipeId/reviews`
-**Description:** Create or update review for a recipe  
-**Auth Required:** Yes  
-**Body:**
-```json
-{
-  "rating": 5,
-  "comment": "Excellent recipe!"
-}
-```
-
-### GET `/recipes/:recipeId/reviews`
-**Description:** Get all reviews for a recipe  
-**Auth Required:** No
-
-### DELETE `/recipes/:recipeId/reviews/me`
-**Description:** Delete my review  
-**Auth Required:** Yes
-
----
-
-## 7. Favorites Routes (`/favorites`)
-
-### POST `/favorites/add/:recipeId`
-**Description:** Add recipe to favorites  
-**Auth Required:** Yes
-
-### DELETE `/favorites/delete/:recipeId`
-**Description:** Remove recipe from favorites  
-**Auth Required:** Yes
-
-### GET `/favorites/all`
-**Description:** Get all my favorite recipes  
-**Auth Required:** Yes
-
----
-
-## 8. Collections Routes (`/collections`)
-
-### POST `/collections/create`
-**Description:** Create a new collection  
-**Auth Required:** Yes  
-**Body:**
-```json
-{
-  "name": "My Italian Recipes"
-}
-```
-
-### GET `/collections/all`
-**Description:** Get all my collections  
-**Auth Required:** Yes
-
-### GET `/collections/by/:collectionId`
-**Description:** Get collection by ID with recipes  
-**Auth Required:** Yes
-
-### PUT `/collections/update/:collectionId`
-**Description:** Update collection name  
-**Auth Required:** Yes  
-**Body:**
-```json
-{
-  "name": "Updated Collection Name"
-}
-```
-
-### DELETE `/collections/delete/:collectionId`
-**Description:** Delete collection  
-**Auth Required:** Yes
-
-### POST `/collections/:collectionId/recipes/add/:recipeId`
-**Description:** Add recipe to collection  
-**Auth Required:** Yes
-
-### DELETE `/collections/:collectionId/recipes/remove/:recipeId`
-**Description:** Remove recipe from collection  
-**Auth Required:** Yes
-
----
-## Authentication Details
-
-### Cookies Used
-- `accessToken` - Valid for 24 hours
-- `refreshToken` - Valid for 7 days
-
-### Cookie Options
 ```javascript
-{
-  httpOnly: true,
-  secure: true (in production),
-  sameSite: "strict",
-  credentials: true
+app.use(cors({
+    origin: 'http://localhost:8000', // Your frontend URL
+    credentials: true,
+}));
+```
+
+## 📚 API Endpoints Used
+
+### Authentication
+- `POST /api/v1/auth/signup` - Register new user
+- `POST /api/v1/auth/signin` - Login
+- `POST /api/v1/auth/logout` - Logout
+- `POST /api/v1/auth/refresh` - Refresh token
+
+### User Profile
+- `GET /api/v1/user/profile` - Get profile
+- `PUT /api/v1/user/profile` - Update profile
+
+### Recipes
+- `GET /api/v1/recipes` - Get all recipes (with filters)
+- `GET /api/v1/recipes/:id` - Get recipe by ID
+- `POST /api/v1/recipes/create` - Create recipe
+- `PUT /api/v1/recipes/:id` - Update recipe
+- `DELETE /api/v1/recipes/delete/:id` - Delete recipe
+
+### Reviews
+- `POST /api/v1/recipes/:recipeId/reviews` - Create/update review
+- `GET /api/v1/recipes/:recipeId/reviews` - Get recipe reviews
+- `DELETE /api/v1/recipes/:recipeId/reviews/me` - Delete my review
+
+### Favorites
+- `GET /api/v1/favorites/all` - Get all favorites
+- `POST /api/v1/favorites/add/:recipeId` - Add to favorites
+- `DELETE /api/v1/favorites/delete/:recipeId` - Remove from favorites
+
+### Collections
+- `GET /api/v1/collections/all` - Get all collections
+- `POST /api/v1/collections/create` - Create collection
+- `GET /api/v1/collections/by/:id` - Get collection by ID
+- `PUT /api/v1/collections/update/:id` - Update collection
+- `DELETE /api/v1/collections/delete/:id` - Delete collection
+- `POST /api/v1/collections/:collectionId/recipes/add/:recipeId` - Add recipe to collection
+- `DELETE /api/v1/collections/:collectionId/recipes/remove/:recipeId` - Remove recipe from collection
+
+### Follow
+- `POST /api/v1/user/profile/follow/:userId` - Follow user
+- `DELETE /api/v1/user/profile/follow/:userId` - Unfollow user
+- `GET /api/v1/user/profile/follow/following/me` - Get following list
+- `GET /api/v1/user/profile/follow/followers/me` - Get followers list
+
+### Feed
+- `GET /api/v1/user/profile/feed` - Get personalized feed
+
+### Admin (requires admin role)
+- `GET /api/v1/admin/users` - Get all users
+- `PATCH /api/v1/admin/users/:userId/ban` - Ban user
+- `PATCH /api/v1/admin/users/:userId/unban` - Unban user
+- `PATCH /api/v1/admin/users/:userId/user-type` - Update user type
+- `GET /api/v1/admin/recipes` - Get all recipes
+- `DELETE /api/v1/admin/recipes/:recipeId` - Delete recipe
+
+## 🎯 Usage Guide
+
+### For Users
+
+1. **Registration**
+   - Click "Sign up" on the login page
+   - Select user type (User/Admin)
+   - Fill in your details
+   - Submit to create account
+
+2. **Login**
+   - Enter your email and password
+   - Select correct user type
+   - Click "Sign In"
+
+3. **Browse Recipes**
+   - View all public recipes on the main page
+   - Use search and filters to find specific recipes
+   - Click on a recipe card to view details
+
+4. **Create Recipe**
+   - Click "+ Add Recipe" button
+   - Fill in all required fields
+   - Add ingredients (one per line)
+   - Write instructions
+   - Submit to save
+
+5. **Manage Favorites**
+   - Click ❤️ icon on any recipe to add to favorites
+   - View all favorites in "Favorites" page
+
+6. **Create Collections**
+   - Go to "Collections" page
+   - Click "+ Create Collection"
+   - Name your collection
+   - Add recipes to collections using 📚 icon
+
+7. **Leave Reviews**
+   - View any recipe
+   - Scroll to reviews section
+   - Select star rating
+   - Write optional comment
+   - Submit review
+
+8. **Follow Users**
+   - View user profiles
+   - Click "Follow" button
+   - See their activity in your feed
+
+### For Admins
+
+1. **Access Admin Panel**
+   - Login with admin account
+   - Click "Admin" in navigation
+   - Access user and recipe management
+
+2. **Manage Users**
+   - View all users
+   - Ban/unban users
+   - Change user roles
+
+3. **Manage Recipes**
+   - View all recipes
+   - Delete inappropriate content
+
+## 🎨 Customization
+
+### Colors
+Edit CSS variables in `css/styles.css`:
+```css
+:root {
+    --primary: #6366f1;
+    --secondary: #8b5cf6;
+    --success: #10b981;
+    --danger: #ef4444;
+    /* ... */
 }
 ```
 
-### Headers Required
-```
-Content-Type: application/json
+### API URL
+Update in `js/config.js`:
+```javascript
+const API_BASE_URL = 'YOUR_API_URL/api/v1';
 ```
 
-### CORS Configuration
-- Origin: `http://localhost:5173`
-- Credentials: `true`
-- Methods: `GET, POST, PUT, PATCH, DELETE`
+## 🔧 Troubleshooting
+
+### CORS Issues
+- Ensure backend CORS is configured with `credentials: true`
+- Check that frontend URL is in backend's allowed origins
+
+### Cookies Not Working
+- Make sure both frontend and backend are on same domain (or use localhost)
+- Check browser settings allow cookies
+- Verify backend sets cookies with proper options
+
+### 401 Unauthorized
+- Access token may have expired
+- Try logging out and logging back in
+- Check if backend refresh token endpoint is working
+
+### Images Not Loading
+- Verify image URLs are accessible
+- Check CORS settings allow image requests
+- Images should be HTTPS if site is HTTPS
+
+## 📱 Browser Support
+
+- Chrome/Edge (latest)
+- Firefox (latest)
+- Safari (latest)
+- Opera (latest)
+
+## 🚀 Deployment
+
+### Deploy to Netlify
+1. Create `netlify.toml`:
+```toml
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+```
+2. Connect repository and deploy
+
+### Deploy to Vercel
+1. Create `vercel.json`:
+```json
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
+```
+2. Connect repository and deploy
+
+### Deploy to GitHub Pages
+1. Push code to GitHub
+2. Go to Settings > Pages
+3. Select branch and folder
+4. Save and access via provided URL
+
+## 📄 License
+
+MIT License - feel free to use for personal or commercial projects
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## 📧 Support
+
+For issues or questions, please create an issue in the repository.
 
 ---
 
-## Response Format
-
-### Success Response
-```json
-{
-  "success": true,
-  "message": "Operation successful",
-  "data": { /* response data */ },
-  "total": 10 // for list responses
-}
-```
-
-### Error Response
-```json
-{
-  "error": "Error message here"
-}
-```
-
-### Common Status Codes
-- `200` - Success
-- `201` - Created
-- `400` - Bad Request
-- `401` - Unauthorized
-- `403` - Forbidden
-- `404` - Not Found
-- `409` - Conflict
-- `500` - Server Error
+**Made with ❤️ for recipe enthusiasts**
