@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 const COOKIE_OPTIONS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
-  sameSite: "strict",
+  sameSite: "lax",  // ✓ Changed from "strict" to "lax"
 };
 
 const signup = async (req, res, next) => {

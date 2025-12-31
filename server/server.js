@@ -14,21 +14,33 @@ const recipeRoutes = require("./src/routes/recipeRouter");
 const favoriteRoutes = require("./src/routes/favoriteRouter");
 const collectionRoutes = require("./src/routes/collectionRouter");
 const adminRoutes = require("./src/routes/adminRouter");
+const Sentry = require("@sentry/node");
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  tracesSampleRate: 1.0, // adjust lower in prod if needed
+});
 
 app.disable("x-powered-by");
 
 // Middleware
-app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser());
+app.use(express.json({ limit: "10mb" }));
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: [
+      process.env.CLIENT_URL || "http://127.0.0.1:5500",
+      "http://localhost:5500",
+    ],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+app.options(/(.*)/, cors());
+
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000,
